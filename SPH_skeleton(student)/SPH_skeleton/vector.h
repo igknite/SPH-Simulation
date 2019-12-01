@@ -211,6 +211,10 @@ public:
 	{
 		return (x*v.x + y*v.y + z*v.z);
 	}
+	double dist()
+	{
+		return sqrt(x*x + y * y + z * z);
+	}
 	double dist(vec3 v)
 	{
 		return sqrt(pow(x - v.x, 2) + pow(y - v.y, 2) + pow(z - v.z, 2));

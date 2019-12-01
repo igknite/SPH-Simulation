@@ -13,7 +13,7 @@ Simulator::~Simulator()
 void Simulator::Initialize()
 {
 	timsStep = 0.006;
-	ground = vec3(0.0, -15, 0.0);
+	ground = vec3(0.0, -20.0, 0.0);
 	mySPH->iteration_n = 6;
 	mySPH->init();
 }

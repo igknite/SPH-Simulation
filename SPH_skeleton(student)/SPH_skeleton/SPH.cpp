@@ -92,7 +92,7 @@ void SPH::draw()
 double SPH::poly6Kernel(vec3 rij, double h)
 {
 	double temp = 0.0;
-	double norm = rij.dist(vec3(1.0,1.0,1.0));	// norm 수치 제대로 넣을것
+	double norm = rij.dist();
 	temp = h*h - norm * norm;
 
 	return 4.0 / (SPH_PI*h*h*h*h*h*h*h*h) * temp*temp*temp;
@@ -125,10 +125,14 @@ void SPH::computeDensity()
 			{
 				Particle *pi = ris[i];
 				pi->density = 0.0;	//compute with poly6Kernel
-				
-				/*Implements - Compute Density 작성, 아래 density 초기화는 지울 것*/
-				pi->density = 1.0;
-				
+				for (int j = 0; j < rjs.size(); j++) {
+					Particle* pj = rjs[j];
+					vec3 rij = pi->position - pj->position;
+					double q = rij.dist() / h;
+					if (0.0 <= q && q < 1.0) {
+						pi->density = pi->density + pj->mass*poly6Kernel(rij, h);
+					}
+				}				
 			}
 		}
 	}
@@ -148,9 +152,15 @@ void SPH::computeForce() // Compute Pressure and Viscosity
 				Particle *pi = ris[i];
 				pi->fpressure = vec3(0.0, 0.0,0.0);//compute with spikygradientKernel
 				pi->fviscosity = vec3(0.0, 0.0,0.0);//compute with viscositylaplacianKernel
-
-				/*Implements - Compute Pressure and Viscosity Forces 작성*/
-
+				for (int j = 0; j < rjs.size(); j++) {
+					Particle* pj = rjs[j];
+					vec3 rij = pi->position - pj->position;
+					double q = rij.dist() / h;
+					if (0.0 <= q && q < 1.0) {
+						pi->fpressure = pi->fpressure + pj->mass * (k * ((pi->density - rest_density) + (pj->density - rest_density)) / (2.0*pj->density)) * spikygradientKernel(rij, q);
+						pi->fviscosity = pi->fviscosity + pj->mass * ((pj->velocity - pi->velocity) / pj->density) * viscositylaplacianKernel(rij, q);
+					}
+				}
 			}
 		}
 	}
