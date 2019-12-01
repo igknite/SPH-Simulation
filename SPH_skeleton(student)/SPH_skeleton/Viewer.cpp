@@ -58,12 +58,10 @@ void Viewer::Render(void)
 
 void Viewer::Reshape(int w, int h)
 {
-	glViewport(0, 0, w, h);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glOrtho(-20, 20, -20, 20, 0, 100);
-	//glOrtho(-20.5, 20.5, -20.5, 20.5, 0, 100);
-	glutPostRedisplay();
+	gluPerspective(45, (float)w / h, 0.1, 500);
+	glViewport(0, 0, w, h);
 }
 
 void Viewer::Keyboard(unsigned char key, int x, int y)
