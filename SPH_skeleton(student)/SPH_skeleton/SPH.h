@@ -27,17 +27,17 @@ public:
 	void init();
 	void damBreaking();
 	void pouring();
-	void update(float dt, vec2 gravity);
+	void update(float dt, vec3 gravity);
 	void draw();
 	void makeHashTable();
 	void computeDensity();
 	void computeForce();
-	void integrate(double dt, vec2 gravity);
+	void integrate(double dt, vec3 gravity);
 
 private:	//kernel functions for SPH
-	double	poly6Kernel(vec2 rij, double h);
-	vec2	spikygradientKernel(vec2 rij, double q);
-	double	viscositylaplacianKernel(vec2 rij, double q);
+	double	poly6Kernel(vec3 rij, double h);
+	vec3	spikygradientKernel(vec3 rij, double q);
+	double	viscositylaplacianKernel(vec3 rij, double q);
 private:
 	vector<Particle *> hashGrid[GRIDSIZE][GRIDSIZE];
 	vector<Particle *> getNeighbor(int gridx, int gridy, double radius, vector<Particle *>& mine);

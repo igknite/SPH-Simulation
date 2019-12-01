@@ -9,6 +9,7 @@ public:
 	Simulator				S_Simulator;
 
 public:
+	float					m_Zoom;				// view zoom
 	float					m_Rotate[2];		// x,y
 	float					m_Translate[2];		// x,y
 	int						m_Mouse_Coord[2];	// previous mouse coordinates

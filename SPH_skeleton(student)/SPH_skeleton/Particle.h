@@ -7,30 +7,30 @@ class Particle
 {
 public:
 	double	mass;
-	vec2	position;
-	vec2	velocity;
-	vec2	acceleration;
+	vec3	position;
+	vec3	velocity;
+	vec3	acceleration;
 	double	density;
 	int		idx;
-	vec2	fpressure;
-	vec2	fviscosity;
+	vec3	fpressure;
+	vec3	fviscosity;
 	double  restitution;
 public:
 	Particle(void)
 	{
 	}
-	Particle(double _x, double _y)
+	Particle(double _x, double _y, double _z)
 	{
-		position = vec2(_x, _y);
-		velocity = vec2(0.0, 0.0);
+		position = vec3(_x, _y,_z);
+		velocity = vec3(0.0, 0.0,0.0);
 		mass = 1.0;
 		restitution = 0.5;
 	}
 
-	Particle(double _x, double _y, int _idx) : position(_x, _y), velocity(0.0, 0.0), acceleration(0.0, 0.0), mass(1.0)
+	Particle(double _x, double _y,int _z, int _idx) : position(_x, _y,_z), velocity(0.0, 0.0,0.0), acceleration(0.0, 0.0,0.0), mass(1.0)
 	{
-		fpressure = vec2(0.0, 0.0);
-		fviscosity = vec2(0.0, 0.0);
+		fpressure = vec3(0.0, 0.0,0.0);
+		fviscosity = vec3(0.0,0.0, 0.0);
 		density = 0.0;
 		idx = _idx;
 		restitution = 0.5;
@@ -42,9 +42,9 @@ public:
 	double	getPosX(void) { return position.getX(); }
 	double	getPosY(void) { return position.getY(); }
 
-	void integrate(double dt, vec2 gravity)
+	void integrate(double dt, vec3 gravity)
 	{
-		vec2 fgrav = gravity * mass;
+		vec3 fgrav = gravity * mass;
 
 		// Update velocity and position
 		acceleration = (fpressure + fviscosity) / density + fgrav;
@@ -72,6 +72,17 @@ public:
 			velocity.y *= -restitution;
 			position.y = 20.0-0.1;
 		}
+		if (position.z < -20.0 && velocity.z < 0.0)
+		{
+			velocity.z *= -restitution;
+			position.z = -20.0 + 0.1;
+		}
+		if (position.z > 20.0 && velocity.z > 0.0)
+		{
+			velocity.z *= -restitution;
+			position.z = 20.0 - 0.1;
+		}
+
 	}
 
 	void draw();

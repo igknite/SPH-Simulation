@@ -72,7 +72,7 @@ void SPH::pouring()
 	cout << "SPH" << particles.size() << " Paricles" << endl;
 }
 
-void SPH::update(float dt, vec2 gravity)
+void SPH::update(float dt, vec3 gravity)
 {
 	makeHashTable();
 	computeDensity();
@@ -89,25 +89,25 @@ void SPH::draw()
 	}
 }
 
-double SPH::poly6Kernel(vec2 rij, double h)
+double SPH::poly6Kernel(vec3 rij, double h)
 {
 	double temp = 0.0;
-	double norm = rij.dist();
+	double norm = rij.dist(vec3(1.0,1.0,1.0));	// norm 수치 제대로 넣을것
 	temp = h*h - norm * norm;
 
 	return 4.0 / (SPH_PI*h*h*h*h*h*h*h*h) * temp*temp*temp;
 }
 
-vec2 SPH::spikygradientKernel(vec2 rij, double q)
+vec3 SPH::spikygradientKernel(vec3 rij, double q)
 {
 	double temp = 0.0;
 	temp = 1.0 - q*q;
 	temp = -30.0 / (SPH_PI*h*h*h*h) * (temp*temp)/q;
 
-	return  vec2(temp*rij.x, temp*rij.y);
+	return  vec3(temp*rij.x, temp*rij.y,temp*rij.z);
 }
 
-double SPH::viscositylaplacianKernel(vec2 rij, double q)
+double SPH::viscositylaplacianKernel(vec3 rij, double q)
 {
 	return 40.0 / (SPH_PI*h*h*h*h) * (1.0 - q);
 }
@@ -146,8 +146,8 @@ void SPH::computeForce() // Compute Pressure and Viscosity
 			for (int i = 0; i < ris.size(); i++)
 			{
 				Particle *pi = ris[i];
-				pi->fpressure = vec2(0.0, 0.0);//compute with spikygradientKernel
-				pi->fviscosity = vec2(0.0, 0.0);//compute with viscositylaplacianKernel
+				pi->fpressure = vec3(0.0, 0.0,0.0);//compute with spikygradientKernel
+				pi->fviscosity = vec3(0.0, 0.0,0.0);//compute with viscositylaplacianKernel
 
 				/*Implements - Compute Pressure and Viscosity Forces 작성*/
 
@@ -156,7 +156,7 @@ void SPH::computeForce() // Compute Pressure and Viscosity
 	}
 }
 
-void SPH::integrate(double dt, vec2 gravity)
+void SPH::integrate(double dt, vec3 gravity)
 {
 	for (int i = 0; i < particles.size(); i++)
 	{
