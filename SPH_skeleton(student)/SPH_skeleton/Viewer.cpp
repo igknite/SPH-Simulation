@@ -40,14 +40,18 @@ void Viewer::Render(void)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	gluLookAt(0.0f, 0.0f, 20.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f);
 	glTranslatef(0.0, 0.0, -m_Zoom);
 
 	glTranslatef(m_Translate[0], m_Translate[1], 0.0);
+
 	glPushMatrix();
 	glRotatef(m_Rotate[0], 1.0, 0.0, 0.0);
 	glRotatef(m_Rotate[1], 0.0, 1.0, 0.0);
 	S_Simulator.Render();
+	glPopMatrix();
+
+	float light_pos[] = { 150.0, 150.0, 0.0, 1.0 };
+	glLightfv(GL_LIGHT0, GL_POSITION, light_pos);
 
 	glutSwapBuffers();
 }

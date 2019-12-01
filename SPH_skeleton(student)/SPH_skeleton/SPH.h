@@ -39,6 +39,6 @@ private:	//kernel functions for SPH
 	vec3	spikygradientKernel(vec3 rij, double q);
 	double	viscositylaplacianKernel(vec3 rij, double q);
 private:
-	vector<Particle *> hashGrid[GRIDSIZE][GRIDSIZE];
-	vector<Particle *> getNeighbor(int gridx, int gridy, double radius, vector<Particle *>& mine);
+	vector<Particle *> hashGrid[GRIDSIZE][GRIDSIZE][GRIDSIZE];
+	vector<Particle *> getNeighbor(int gridx, int gridy,int gridz, double radius, vector<Particle *>& mine);
 };

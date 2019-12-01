@@ -41,6 +41,8 @@ public:
 
 	double	getPosX(void) { return position.getX(); }
 	double	getPosY(void) { return position.getY(); }
+	double	getPosZ(void) { return position.getZ(); }
+
 
 	void integrate(double dt, vec3 gravity)
 	{

@@ -118,21 +118,24 @@ void SPH::computeDensity()
 	{
 		for (int y = 0; y < GRIDSIZE; y++)
 		{
-			vector<Particle*> ris;
-			vector<Particle*> rjs = getNeighbor(x, y, h, ris);
-
-			for (int i = 0; i < ris.size(); i++)
+			for(int z=0;z<GRIDSIZE;z++)
 			{
-				Particle *pi = ris[i];
-				pi->density = 0.0;	//compute with poly6Kernel
-				for (int j = 0; j < rjs.size(); j++) {
-					Particle* pj = rjs[j];
-					vec3 rij = pi->position - pj->position;
-					double q = rij.dist() / h;
-					if (0.0 <= q && q < 1.0) {
-						pi->density = pi->density + pj->mass*poly6Kernel(rij, h);
+				vector<Particle*> ris;
+				vector<Particle*> rjs = getNeighbor(x, y, z, h, ris);
+
+				for (int i = 0; i < ris.size(); i++)
+				{
+					Particle *pi = ris[i];
+					pi->density = 0.0;	//compute with poly6Kernel
+					for (int j = 0; j < rjs.size(); j++) {
+						Particle* pj = rjs[j];
+						vec3 rij = pi->position - pj->position;
+						double q = rij.dist() / h;
+						if (0.0 <= q && q < 1.0) {
+							pi->density = pi->density + pj->mass*poly6Kernel(rij, h);
+						}
 					}
-				}				
+				}
 			}
 		}
 	}
@@ -144,21 +147,23 @@ void SPH::computeForce() // Compute Pressure and Viscosity
 	{
 		for (int y = 0; y < GRIDSIZE; y++)
 		{
-			vector<Particle*> ris;
-			vector<Particle*> rjs = getNeighbor(x, y, h, ris);
+			for(int z =0;z<GRIDSIZE;z++){
+				vector<Particle*> ris;
+				vector<Particle*> rjs = getNeighbor(x, y, z, h, ris);
 
-			for (int i = 0; i < ris.size(); i++)
-			{
-				Particle *pi = ris[i];
-				pi->fpressure = vec3(0.0, 0.0,0.0);//compute with spikygradientKernel
-				pi->fviscosity = vec3(0.0, 0.0,0.0);//compute with viscositylaplacianKernel
-				for (int j = 0; j < rjs.size(); j++) {
-					Particle* pj = rjs[j];
-					vec3 rij = pi->position - pj->position;
-					double q = rij.dist() / h;
-					if (0.0 <= q && q < 1.0) {
-						pi->fpressure = pi->fpressure + pj->mass * (k * ((pi->density - rest_density) + (pj->density - rest_density)) / (2.0*pj->density)) * spikygradientKernel(rij, q);
-						pi->fviscosity = pi->fviscosity + pj->mass * ((pj->velocity - pi->velocity) / pj->density) * viscositylaplacianKernel(rij, q);
+				for (int i = 0; i < ris.size(); i++)
+				{
+					Particle *pi = ris[i];
+					pi->fpressure = vec3(0.0, 0.0, 0.0);//compute with spikygradientKernel
+					pi->fviscosity = vec3(0.0, 0.0, 0.0);//compute with viscositylaplacianKernel
+					for (int j = 0; j < rjs.size(); j++) {
+						Particle* pj = rjs[j];
+						vec3 rij = pi->position - pj->position;
+						double q = rij.dist() / h;
+						if (0.0 <= q && q < 1.0) {
+							pi->fpressure = pi->fpressure + pj->mass * (k * ((pi->density - rest_density) + (pj->density - rest_density)) / (2.0*pj->density)) * spikygradientKernel(rij, q);
+							pi->fviscosity = pi->fviscosity + pj->mass * ((pj->velocity - pi->velocity) / pj->density) * viscositylaplacianKernel(rij, q);
+						}
 					}
 				}
 			}
@@ -181,7 +186,10 @@ void SPH::makeHashTable()
 	{
 		for (int q = 0; q < GRIDSIZE; q++)
 		{
-			hashGrid[p][q].clear();
+			for (int r = 0; r < GRIDSIZE; r++)
+			{
+				hashGrid[p][q][r].clear();
+			}
 		}
 	}
 	
@@ -190,19 +198,23 @@ void SPH::makeHashTable()
 		Particle *p = particles[i];
 		double x = (p->getPosX() + GRIDSIZE / 2);
 		double y = (p->getPosY() + GRIDSIZE / 2);
+		double z = (p->getPosZ() + GRIDSIZE / 2);
 		int gridx = (int)(x);					
 		int gridy = (int)(y);					
+		int gridz = (int)(z);
 
 		if (gridx < 0) gridx = 0;
 		if (gridx > GRIDSIZE - 1) gridx = GRIDSIZE - 1;
 		if (gridy < 0) gridy = 0;
 		if (gridy > GRIDSIZE - 1) gridy = GRIDSIZE - 1;
+		if (gridz < 0) gridz = 0;
+		if (gridz > GRIDSIZE - 1) gridz = GRIDSIZE - 1;
 
-		hashGrid[gridx][gridy].push_back(p);
+		hashGrid[gridx][gridy][gridz].push_back(p);
 	}
 }
 
-vector<Particle *> SPH::getNeighbor(int gridx, int gridy, double radius, vector<Particle*> &mine)
+vector<Particle *> SPH::getNeighbor(int gridx, int gridy,int gridz, double radius, vector<Particle*> &mine)
 {
 	vector<Particle *>res;
 	mine.clear();
@@ -210,15 +222,17 @@ vector<Particle *> SPH::getNeighbor(int gridx, int gridy, double radius, vector<
 	{
 		for (int j = gridy - (int)radius; j <= gridy + (int)radius; j++)
 		{
-			if (i < 0 || i > GRIDSIZE - 1 || j < 0 || j > GRIDSIZE - 1)
-				continue;
+			for (int l = gridz - (int)radius; l <= gridz + (int)radius; l++) {
+				if (i < 0 || i > GRIDSIZE - 1 || j < 0 || j > GRIDSIZE - 1 || l < 0 || l > GRIDSIZE - 1)
+					continue;
 
-			for (int k = 0; k < hashGrid[i][j].size(); k++)
-			{
-				res.push_back(hashGrid[i][j][k]);
+				for (int k = 0; k < hashGrid[i][j][l].size(); k++)
+				{
+					res.push_back(hashGrid[i][j][l][k]);
 
-				if (i == gridx && j == gridy)
-					mine.push_back(hashGrid[i][j][k]);
+					if (i == gridx && j == gridy)
+						mine.push_back(hashGrid[i][j][l][k]);
+				}
 			}
 		}
 	}
