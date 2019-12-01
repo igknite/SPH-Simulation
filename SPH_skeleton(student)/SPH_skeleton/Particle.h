@@ -27,7 +27,7 @@ public:
 		restitution = 0.5;
 	}
 
-	Particle(double _x, double _y,int _z, int _idx) : position(_x, _y,_z), velocity(0.0, 0.0,0.0), acceleration(0.0, 0.0,0.0), mass(1.0)
+	Particle(double _x, double _y, double _z, int _idx) : position(_x, _y,_z), velocity(0.0, 0.0,0.0), acceleration(0.0, 0.0,0.0), mass(1.0)
 	{
 		fpressure = vec3(0.0, 0.0,0.0);
 		fviscosity = vec3(0.0,0.0, 0.0);

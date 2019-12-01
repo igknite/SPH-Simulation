@@ -42,12 +42,15 @@ void SPH::init()
 
 void SPH::damBreaking()
 {
-	for (double y = -15.0; y < 20.0; y += 0.5) {
-		for (double x = -18.0; x < -10.0; x += 0.5) {
-			if (particles.size() < MaxParticle)
-			{
-				Particle *p = new Particle(x, y, index++);
-				particles.push_back(p);
+	for (double y = 10.0; y < 20.0; y += 0.5) {
+		for (double x = -5.0; x < 5.0; x+=0.5) {
+			for (double z = -5.0; z < 5.0; z +=0.5) {
+				if (particles.size() < MaxParticle)
+				{
+					Particle *p = new Particle(x, y, z, index++);
+					
+					particles.push_back(p);
+				}
 			}
 		}
 	}
@@ -131,7 +134,7 @@ void SPH::computeDensity()
 						Particle* pj = rjs[j];
 						vec3 rij = pi->position - pj->position;
 						double q = rij.dist() / h;
-						if (0.0 <= q && q < 1.0) {
+						if (0.0 < q && q < 1.0) {
 							pi->density = pi->density + pj->mass*poly6Kernel(rij, h);
 						}
 					}
@@ -160,11 +163,13 @@ void SPH::computeForce() // Compute Pressure and Viscosity
 						Particle* pj = rjs[j];
 						vec3 rij = pi->position - pj->position;
 						double q = rij.dist() / h;
-						if (0.0 <= q && q < 1.0) {
+						if (0.0 < q && q < 1.0) {
 							pi->fpressure = pi->fpressure + pj->mass * (k * ((pi->density - rest_density) + (pj->density - rest_density)) / (2.0*pj->density)) * spikygradientKernel(rij, q);
 							pi->fviscosity = pi->fviscosity + pj->mass * ((pj->velocity - pi->velocity) / pj->density) * viscositylaplacianKernel(rij, q);
 						}
 					}
+					pi->fpressure = -1.0 * pi->fpressure;
+					pi->fviscosity = mu * pi->fviscosity;
 				}
 			}
 		}
@@ -230,7 +235,7 @@ vector<Particle *> SPH::getNeighbor(int gridx, int gridy,int gridz, double radiu
 				{
 					res.push_back(hashGrid[i][j][l][k]);
 
-					if (i == gridx && j == gridy)
+					if (i == gridx && j == gridy && l == gridz)
 						mine.push_back(hashGrid[i][j][l][k]);
 				}
 			}

@@ -3,7 +3,7 @@
 Simulator::Simulator()
 {
 	timsStep = 0.001f;
-	mySPH = new SPH(1000);	// the number of particles
+	mySPH = new SPH(8000);	// the number of particles
 }
 Simulator::~Simulator()
 {
