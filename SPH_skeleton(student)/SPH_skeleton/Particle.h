@@ -15,6 +15,7 @@ public:
 	vec3	fpressure;
 	vec3	fviscosity;
 	double  restitution;
+	vec3	color;
 public:
 	Particle(void)
 	{
@@ -54,15 +55,15 @@ public:
 		position = position + velocity * dt;
 
 		// Boundary condition
-		if (position.x < -20.0 && velocity.x < 0.0)
+		if (position.x < -10.0 && velocity.x < 0.0)
 		{
 			velocity.x *= -restitution;
-			position.x = -20.0+0.1;
+			position.x = -10.0+0.1;
 		}
-		if (position.x > 20.0 && velocity.x > 0.0)
+		if (position.x > 10.0 && velocity.x > 0.0)
 		{
 			velocity.x *= -restitution;
-			position.x = 20.0-0.1;
+			position.x = 10.0-0.1;
 		}
 		if (position.y < -20.0 && velocity.y < 0.0)
 		{
@@ -74,15 +75,15 @@ public:
 			velocity.y *= -restitution;
 			position.y = 20.0-0.1;
 		}
-		if (position.z < -20.0 && velocity.z < 0.0)
+		if (position.z < -10.0 && velocity.z < 0.0)
 		{
 			velocity.z *= -restitution;
-			position.z = -20.0 + 0.1;
+			position.z = -10.0 + 0.1;
 		}
-		if (position.z > 20.0 && velocity.z > 0.0)
+		if (position.z > 10.0 && velocity.z > 0.0)
 		{
 			velocity.z *= -restitution;
-			position.z = 20.0 - 0.1;
+			position.z = 10.0 - 0.1;
 		}
 
 	}

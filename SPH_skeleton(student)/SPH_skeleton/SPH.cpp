@@ -48,7 +48,11 @@ void SPH::damBreaking()
 				if (particles.size() < MaxParticle)
 				{
 					Particle *p = new Particle(x, y, z, index++);
-					
+					if (y < 12.0) p->color = vec3(1.0f, 0.0f, 0.0f);
+					else if (y < 14.0) p->color = vec3(1.0f, 1.0f, 0.0f);
+					else if (y < 16.0) p->color = vec3(0.0f, 1.0f, 0.0f);
+					else if (y < 18.0) p->color = vec3(0.0f, 0.0f, 1.0f);
+					else p->color = vec3(0.4f, 0.0f, 1.0f);
 					particles.push_back(p);
 				}
 			}
