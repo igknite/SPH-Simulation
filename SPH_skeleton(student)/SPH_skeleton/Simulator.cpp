@@ -16,6 +16,7 @@ void Simulator::Initialize()
 	ground = vec3(0.0, -20.0, 0.0);
 	mySPH->iteration_n = 6;
 	mySPH->init();
+    timer = 0;
 }
 
 void Simulator::Update()
@@ -27,6 +28,8 @@ void Simulator::Update()
 	{
 		mySPH->update(timsStep, gravity);
 	}
+    if (timer >= 2) timer -= 3;
+    timer++;
 }
 
 void Simulator::Render()
@@ -71,18 +74,37 @@ void Simulator::Lighting()
 }
 
 void Simulator::DrawGround(void) {
+    int timenum = (float)timer;
+
+    glBindTexture(GL_TEXTURE_2D, mySPH->Texture[timenum]);
+
+    glEnable(GL_TEXTURE_2D);
 
 	glBegin(GL_QUADS);
-	glColor3f(1.0, 1.0, 1.0);
-
+	//glColor3f(1.0, 1.0, 1.0);
+    
 	for (int x = 0; x<128; x++) {
 		for (int y = 0; y<128; y++) {
 			glNormal3f(0.0, 1.0, 0.0);
-			glVertex3f(-250.0f + 250.0f / 64 * x, ground.y, -250.0f + 250.0f / 64 * y);
-			glVertex3f(-250.0f + 250.0f / 64 * (x + 1), ground.y, -250.0f + 250.0f / 64 * y);
-			glVertex3f(-250.0f + 250.0f / 64 * (x + 1), ground.y, -250.0f + 250.0f / 64 * (y + 1));
-			glVertex3f(-250.0f + 250.0f / 64 * x, ground.y, -250.0f + 250.0f / 64 * (y + 1));
+            glTexCoord2f((float)x / 128, (float)y / 128);
+
+			glVertex3f(-50.0f + 50.0f / 64 * x, ground.y, -50.0f + 50.0f / 64 * y);
+            glTexCoord2f((float)(x + 1) / 128, (float)y / 128);
+            glVertex3f(-50.0f + 50.0f / 64 * (x + 1), ground.y, -50.0f + 50.0f / 64 * y);
+            glTexCoord2f((float)(x + 1) / 128, (float)(y + 1) / 128);
+            glVertex3f(-50.0f + 50.0f / 64 * (x + 1), ground.y, -50.0f + 50.0f / 64 * (y + 1));
+            glTexCoord2f((float)x / 128, (float)(y + 1) / 128);
+            glVertex3f(-50.0f + 50.0f / 64 * x, ground.y, -50.0f + 50.0f / 64 * (y + 1));
 		}
 	}
+    
+    /*glNormal3f(0.0, 1.0, 0.0);
+    glVertex3f(-250.0f, ground.y, -250.0f);
+    glVertex3f(-250.0f, ground.y, 250.0f);
+    glVertex3f(250.0f, ground.y, 250.0f);
+    glVertex3f(250.0f, ground.y, -250.0f);*/
+    
 	glEnd();
+    glDisable(GL_TEXTURE_2D);
+
 }

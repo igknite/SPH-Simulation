@@ -18,7 +18,7 @@ public:
 	void					Render();
 	void					Lighting(void);
 	void					DrawGround(void);
-
+    float                   timer;
 public:
 	SPH						*mySPH;
 	double					timsStep;

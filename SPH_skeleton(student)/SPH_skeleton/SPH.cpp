@@ -1,6 +1,6 @@
 #include "SPH.h"
 #include <time.h>
-
+#include <omp.h>
 SPH::SPH()
 {
 
@@ -38,6 +38,9 @@ void SPH::init()
 {
 	resetParticle();
 	damBreaking();
+    LoadTexture("0001.bmp", 0);
+    LoadTexture("0002.bmp",1);
+    LoadTexture("0003.bmp",2);
 }
 
 void SPH::damBreaking()
@@ -48,11 +51,11 @@ void SPH::damBreaking()
 				if (particles.size() < MaxParticle)
 				{
 					Particle *p = new Particle(x, y, z, index++);
-					if (y < 12.0) p->color = vec3(1.0f, 0.0f, 0.0f);
-					else if (y < 14.0) p->color = vec3(1.0f, 1.0f, 0.0f);
-					else if (y < 16.0) p->color = vec3(0.0f, 1.0f, 0.0f);
-					else if (y < 18.0) p->color = vec3(0.0f, 0.0f, 1.0f);
-					else p->color = vec3(0.4f, 0.0f, 1.0f);
+                    if (y < 12.0) { p->color = vec3(1.0f, 0.0f, 0.0f); }
+                    else if (y < 14.0) { p->color = vec3(1.0f, 1.0f, 0.0f); }
+                    else if (y < 16.0) { p->color = vec3(0.0f, 1.0f, 0.0f); }
+                    else if (y < 18.0) { p->color = vec3(0.0f, 0.0f, 1.0f); }
+                    else { p->color = vec3(0.4f, 0.0f, 1.0f); }
 					particles.push_back(p);
 				}
 			}
@@ -121,9 +124,10 @@ double SPH::viscositylaplacianKernel(vec3 rij, double q)
 
 void SPH::computeDensity()
 {
+#pragma omp parallel for
 	for (int x = 0; x < GRIDSIZE; x++)
 	{
-		for (int y = 0; y < GRIDSIZE; y++)
+		for (int y = 0; y < GRIDSIZEY; y++)
 		{
 			for(int z=0;z<GRIDSIZE;z++)
 			{
@@ -150,9 +154,10 @@ void SPH::computeDensity()
 
 void SPH::computeForce() // Compute Pressure and Viscosity
 {
-	for (int x = 0; x < GRIDSIZE; x++)
+#pragma omp parallel for
+    for (int x = 0; x < GRIDSIZE; x++)
 	{
-		for (int y = 0; y < GRIDSIZE; y++)
+		for (int y = 0; y < GRIDSIZEY; y++)
 		{
 			for(int z =0;z<GRIDSIZE;z++){
 				vector<Particle*> ris;
@@ -182,6 +187,7 @@ void SPH::computeForce() // Compute Pressure and Viscosity
 
 void SPH::integrate(double dt, vec3 gravity)
 {
+#pragma omp parallel for
 	for (int i = 0; i < particles.size(); i++)
 	{
 		Particle *p = particles[i];
@@ -193,7 +199,7 @@ void SPH::makeHashTable()
 {
 	for (int p = 0; p < GRIDSIZE; p++)
 	{
-		for (int q = 0; q < GRIDSIZE; q++)
+		for (int q = 0; q < GRIDSIZEY; q++)
 		{
 			for (int r = 0; r < GRIDSIZE; r++)
 			{
@@ -206,7 +212,7 @@ void SPH::makeHashTable()
 	{
 		Particle *p = particles[i];
 		double x = (p->getPosX() + GRIDSIZE / 2);
-		double y = (p->getPosY() + GRIDSIZE / 2);
+		double y = (p->getPosY() + GRIDSIZEY / 2);
 		double z = (p->getPosZ() + GRIDSIZE / 2);
 		int gridx = (int)(x);					
 		int gridy = (int)(y);					
@@ -215,7 +221,7 @@ void SPH::makeHashTable()
 		if (gridx < 0) gridx = 0;
 		if (gridx > GRIDSIZE - 1) gridx = GRIDSIZE - 1;
 		if (gridy < 0) gridy = 0;
-		if (gridy > GRIDSIZE - 1) gridy = GRIDSIZE - 1;
+		if (gridy > GRIDSIZEY - 1) gridy = GRIDSIZEY - 1;
 		if (gridz < 0) gridz = 0;
 		if (gridz > GRIDSIZE - 1) gridz = GRIDSIZE - 1;
 
@@ -232,7 +238,7 @@ vector<Particle *> SPH::getNeighbor(int gridx, int gridy,int gridz, double radiu
 		for (int j = gridy - (int)radius; j <= gridy + (int)radius; j++)
 		{
 			for (int l = gridz - (int)radius; l <= gridz + (int)radius; l++) {
-				if (i < 0 || i > GRIDSIZE - 1 || j < 0 || j > GRIDSIZE - 1 || l < 0 || l > GRIDSIZE - 1)
+				if (i < 0 || i > GRIDSIZE - 1 || j < 0 || j > GRIDSIZEY - 1 || l < 0 || l > GRIDSIZE - 1)
 					continue;
 
 				for (int k = 0; k < hashGrid[i][j][l].size(); k++)
