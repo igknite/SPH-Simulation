@@ -81,7 +81,7 @@ void Simulator::DrawGround(void) {
     glEnable(GL_TEXTURE_2D);
 
 	glBegin(GL_QUADS);
-	//glColor3f(1.0, 1.0, 1.0);
+	glColor3f(1.0, 1.0, 1.0);
     
 	for (int x = 0; x<128; x++) {
 		for (int y = 0; y<128; y++) {
