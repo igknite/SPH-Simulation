@@ -80,6 +80,15 @@ void Viewer::Keyboard(unsigned char key, int x, int y)
 	case 'R':
 		S_Simulator.Initialize();
 		break;
+
+	case 'F':
+	case 'f':
+		S_Simulator.on_HOS = !S_Simulator.on_HOS;
+		break;
+	case 'E':
+	case 'e':
+		S_Simulator.mySPH->pouring();
+		break;
 	}
 	glutPostRedisplay();
 }

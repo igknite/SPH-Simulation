@@ -3,7 +3,8 @@
 Simulator::Simulator()
 {
 	timsStep = 0.001f;
-	mySPH = new SPH(8000);	// the number of particles
+	t_inter = 2;
+	mySPH = new SPH(100000);	// the number of particles
 }
 Simulator::~Simulator()
 {
@@ -17,6 +18,7 @@ void Simulator::Initialize()
 	mySPH->iteration_n = 6;
 	mySPH->init();
     timer = 0;
+	on_HOS = false;
 }
 
 void Simulator::Update()
@@ -28,8 +30,10 @@ void Simulator::Update()
 	{
 		mySPH->update(timsStep, gravity);
 	}
-    if (timer >= 2) timer -= 3;
-    timer++;
+    if (timer >= 3*t_inter-1) timer -= 3*t_inter;
+	if (on_HOS) mySPH->onHOS = true;
+	if (!on_HOS) mySPH->onHOS = false;
+    if(on_HOS) timer++;
 }
 
 void Simulator::Render()
@@ -74,12 +78,12 @@ void Simulator::Lighting()
 }
 
 void Simulator::DrawGround(void) {
-    int timenum = (float)timer;
+    int timenum = (float)timer/t_inter;
 
-    glBindTexture(GL_TEXTURE_2D, mySPH->Texture[timenum]);
+    if(on_HOS) glBindTexture(GL_TEXTURE_2D, mySPH->Texture[timenum]);
 
     glEnable(GL_TEXTURE_2D);
-
+	if (!on_HOS) glDisable(GL_TEXTURE_2D);
 	glBegin(GL_QUADS);
 	glColor3f(1.0, 1.0, 1.0);
     
@@ -97,12 +101,6 @@ void Simulator::DrawGround(void) {
             glVertex3f(-50.0f + 50.0f / 64 * x, ground.y, -50.0f + 50.0f / 64 * (y + 1));
 		}
 	}
-    
-    /*glNormal3f(0.0, 1.0, 0.0);
-    glVertex3f(-250.0f, ground.y, -250.0f);
-    glVertex3f(-250.0f, ground.y, 250.0f);
-    glVertex3f(250.0f, ground.y, 250.0f);
-    glVertex3f(250.0f, ground.y, -250.0f);*/
     
 	glEnd();
     glDisable(GL_TEXTURE_2D);

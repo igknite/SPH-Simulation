@@ -15,6 +15,7 @@ public:
     int index;				//particle index
     int MaxParticle;
     int iteration_n;
+	bool onHOS;
 private:
     double rest_density;	// rest density
     double mu;				// viscosity constant

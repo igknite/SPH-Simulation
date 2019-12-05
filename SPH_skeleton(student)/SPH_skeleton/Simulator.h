@@ -19,6 +19,8 @@ public:
 	void					Lighting(void);
 	void					DrawGround(void);
     float                   timer;
+	int						t_inter;
+	bool					on_HOS;
 public:
 	SPH						*mySPH;
 	double					timsStep;

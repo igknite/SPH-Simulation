@@ -36,6 +36,7 @@ void SPH::resetParticle()
 
 void SPH::init()
 {
+	onHOS = false;
 	resetParticle();
 	damBreaking();
     LoadTexture("0001.bmp", 0);
@@ -70,12 +71,16 @@ void SPH::pouring()
 		return;
 
 	for (double y = 10.0; y < 13.0; y += 0.4) {
-		for (double x = -20.0; x < -20.0 + 3.0; x += 0.4) {
-			if (particles.size() < MaxParticle)
-			{
-				Particle *p = new Particle(x, y, index++);
-				p->velocity.x = 15.0f;
-				particles.push_back(p);
+		for (double x = -7.0; x < -4.0; x += 0.4) {
+			for (double z = -8.0; z < -5.0; z += 0.4) {
+
+				if (particles.size() < MaxParticle)
+				{
+					Particle *p = new Particle(x, y,z, index++);
+					p->color = vec3(1.0f, 0.2f, 0.0f);
+					p->velocity.x = 15.0f;
+					particles.push_back(p);
+				}
 			}
 		}
 	}
@@ -84,10 +89,29 @@ void SPH::pouring()
 
 void SPH::update(float dt, vec3 gravity)
 {
+	if (onHOS) {
+		int erasepart[100000] = { 0, };
+		int eraseindex = 0;
+		for (int k = 0; k < particles.size(); k++) {
+			Particle *p = particles[k];
+			if (p->position.x > -0.5&&p->position.x < 0.5) {
+				if (p->position.z > -0.5&&p->position.z < 0.5) {
+					if (p->position.y < -19.9) {
+						erasepart[eraseindex] = k;
+						eraseindex++;
+					}
+				}
+			}
+		}
+		for (int k = 0; k < eraseindex; k++) {
+			particles.erase(particles.begin() + erasepart[k] - 1);
+		}
+	}
 	makeHashTable();
 	computeDensity();
 	computeForce();
 	integrate(dt, gravity);
+
 }
 
 void SPH::draw()
