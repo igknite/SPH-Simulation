@@ -16,6 +16,7 @@ public:
 	unsigned char			m_Mouse_Event[3];	// mouse event handler
 	bool					m_start;
 	int						renderMode;
+	bool					m_capture;
 
 public:
 	Viewer(void);
@@ -29,5 +30,6 @@ public:
 	void					Motion(int x, int y);
 	void					Keyboard(unsigned char key, int x, int y);
 	void					Update();
+
 };
 

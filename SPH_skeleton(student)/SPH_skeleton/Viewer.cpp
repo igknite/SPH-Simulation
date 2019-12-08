@@ -80,7 +80,10 @@ void Viewer::Keyboard(unsigned char key, int x, int y)
 	case 'R':
 		S_Simulator.Initialize();
 		break;
-
+	case 'c':
+	case 'C':
+		m_capture = !m_capture;
+		break;
 	case 'F':
 	case 'f':
 		S_Simulator.on_HOS = !S_Simulator.on_HOS;
@@ -138,3 +141,4 @@ void Viewer::Motion(int x, int y)
 	}
 	glutPostRedisplay();
 }
+

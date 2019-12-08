@@ -38,6 +38,7 @@ void Simulator::Update()
 
 void Simulator::Render()
 {
+
 	Lighting();
 	DrawGround();
 	mySPH->draw();
@@ -106,3 +107,4 @@ void Simulator::DrawGround(void) {
     glDisable(GL_TEXTURE_2D);
 
 }
+
